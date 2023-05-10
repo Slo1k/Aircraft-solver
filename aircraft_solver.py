@@ -1,9 +1,10 @@
 import cplex
 import sys
 import re
-
+import time
 
 def solve_conflict_matrix(n, m, CM):
+    start = time.time()
     # Inicjalizacja modelu
     model = cplex.Cplex()
     model.objective.set_sense(model.objective.sense.minimize)
@@ -29,7 +30,6 @@ def solve_conflict_matrix(n, m, CM):
                         if CM[i * m + j][k * m + l] == 1:
                             constraint_expr = [cplex.SparsePair(ind=[x[i * m + j], x[k * m + l]], val=[1, 1])]
                             model.linear_constraints.add(lin_expr=constraint_expr, senses=["L"], rhs=[1])
-
     # Rozwiązanie modelu
     model.solve()
 
@@ -40,6 +40,8 @@ def solve_conflict_matrix(n, m, CM):
             var_value = model.solution.get_values(x[i * m + j])
             result.append(str(int(var_value)))
 
+    end = time.time()
+    print(f"Całkowity czas obliczeń solvera: {end - start} sec")
     return " ".join(result)
 
 
